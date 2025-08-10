@@ -1,0 +1,97 @@
+# Pixelblaze Output Expander Fritzing Schematic
+
+Below is a description of how you would wire up the system in Fritzing.  
+This is a text representation—if you need the actual `.fzz` Fritzing file, let me know and I can guide you through the steps or provide a downloadable example.
+
+---
+
+## **Components Needed**
+- **Pixelblaze controller**
+- **4x STM32F103C8T6 “Blue Pill” boards**
+- **32x LED strips (WS2812 or similar, up to 15 LEDs each)**
+- **Power supply (5V, sized for total LED current)**
+- **Jumper wires**
+- **330–470Ω resistor for each data line**
+- **1000µF capacitor for each strip’s power input**
+
+---
+
+## **Fritzing Connections**
+
+### **Pixelblaze Serial Output**
+- **Pixelblaze TX** → **PA10 (RX1) on each Blue Pill**
+- **Pixelblaze GND** → **GND on each Blue Pill**
+
+### **Blue Pill Board 1 (Channels 0–7)**
+- **PA0 → LED Channel 0 Data In**
+- **PA1 → LED Channel 1 Data In**
+- **PA2 → LED Channel 2 Data In**
+- **PA3 → LED Channel 3 Data In**
+- **PA4 → LED Channel 4 Data In**
+- **PA5 → LED Channel 5 Data In**
+- **PA6 → LED Channel 6 Data In**
+- **PA7 → LED Channel 7 Data In**
+
+### **Blue Pill Board 2 (Channels 8–15)**
+- **PB0 → LED Channel 8 Data In**
+- **PB1 → LED Channel 9 Data In**
+- **PB2 → LED Channel 10 Data In**
+- **PB3 → LED Channel 11 Data In**
+- **PB4 → LED Channel 12 Data In**
+- **PB5 → LED Channel 13 Data In**
+- **PB6 → LED Channel 14 Data In**
+- **PB7 → LED Channel 15 Data In**
+
+### **Blue Pill Board 3 (Channels 16–23)**
+- **PA8 → LED Channel 16 Data In**
+- **PA9 → LED Channel 17 Data In**
+- **PA10 → LED Channel 18 Data In** *(Don’t use PA10 for output if it’s the RX pin!)*
+- **PA11 → LED Channel 19 Data In**
+- **PA12 → LED Channel 20 Data In**
+- **PA13 → LED Channel 21 Data In**
+- **PA14 → LED Channel 22 Data In**
+- **PA15 → LED Channel 23 Data In**
+
+*(You may want to skip PA10 and use another available output pin for channel 18, such as PB8.)*
+
+### **Blue Pill Board 4 (Channels 24–31)**
+- **PB8 → LED Channel 24 Data In**
+- **PB9 → LED Channel 25 Data In**
+- **PB10 → LED Channel 26 Data In**
+- **PB11 → LED Channel 27 Data In**
+- **PB12 → LED Channel 28 Data In**
+- **PB13 → LED Channel 29 Data In**
+- **PB14 → LED Channel 30 Data In**
+- **PB15 → LED Channel 31 Data In**
+
+---
+
+## **Power Distribution**
+
+- Each LED strip gets 5V and GND from the main power supply.
+- Place a **330–470Ω resistor** between each STM32 data output and LED strip data input.
+- Add a **1000µF capacitor** across 5V/GND at the start of each LED strip.
+
+---
+
+## **Important Notes**
+
+- **Common Ground:** All Blue Pills, Pixelblaze, and LED strips must share a common ground.
+- **Serial Data:** Pixelblaze TX is connected in parallel to all four Blue Pills’ RX pins (PA10).
+- **Power:** Do not power LED strips from the Blue Pill directly; use an external 5V supply.
+
+---
+
+## **Fritzing Steps**
+
+1. Place one Pixelblaze, four Blue Pills, and 32 LED strips in your Fritzing project.
+2. Wire Pixelblaze TX to each Blue Pill PA10 (RX1).
+3. Connect each Blue Pill’s output pins to its assigned LED strips' data input, with a series resistor.
+4. Connect power supply 5V and GND to all LED strips.
+5. Add capacitors at the power input of each strip.
+6. Connect all grounds together.
+
+---
+
+## **If you want a downloadable `.fzz` file**
+Let me know, and I’ll provide either a link or walk you through the process!
