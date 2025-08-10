@@ -1,0 +1,8 @@
+**Fritzing Parts:**
+- 1x Generic microcontroller (for Pixelblaze)
+- 4x STM32F103C8T6 "Blue Pill" boards
+- 32x WS2812 LED strip (short, 15 LEDs each)
+- 1x Power supply (5V, sufficient current)
+- 32x 330Ω through-hole resistors
+- 32x 1000µF electrolytic capacitors
+- Jumper wires
