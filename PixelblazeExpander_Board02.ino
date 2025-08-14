@@ -7,8 +7,7 @@ CRGB leds[NUM_CHANNELS][NUM_LEDS_PER_CHANNEL];
 void setup() {
   Serial1.begin(115200);
   for (int i = 0; i < NUM_CHANNELS; i++) {
-    FastLED.addLeds<WS2815
-      , channelPins[i], GRB>(leds[i], NUM_LEDS_PER_CHANNEL);
+    FastLED.addLeds<WS2815, channelPins[i], GRB>(leds[i], NUM_LEDS_PER_CHANNEL);
   }
 }
 void loop() {
