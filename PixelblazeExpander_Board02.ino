@@ -2,12 +2,13 @@
 #define FIRST_CHANNEL 8
 #define NUM_CHANNELS 8
 #define NUM_LEDS_PER_CHANNEL 15
-const uint8_t channelPins[NUM_CHANNELS] = {PB0, PB1, PB2, PB3, PB4, PB5, PB6, PB7};
+const uint8_t channelPins[NUM_CHANNELS] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7};
 CRGB leds[NUM_CHANNELS][NUM_LEDS_PER_CHANNEL];
 void setup() {
   Serial1.begin(115200);
   for (int i = 0; i < NUM_CHANNELS; i++) {
-    FastLED.addLeds<WS2812, channelPins[i], GRB>(leds[i], NUM_LEDS_PER_CHANNEL);
+    FastLED.addLeds<WS2815
+      , channelPins[i], GRB>(leds[i], NUM_LEDS_PER_CHANNEL);
   }
 }
 void loop() {
