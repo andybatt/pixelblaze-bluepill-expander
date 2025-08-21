@@ -1,32 +1,60 @@
-#include <FastLED.h>
-#define FIRST_CHANNEL 24
-#define NUM_CHANNELS 8
-#define NUM_LEDS_PER_CHANNEL 15
-const uint8_t channelPins[NUM_CHANNELS] = {PB8, PB9, PB10, PB11, PB12, PB13, PB14, PB15};
-CRGB leds[NUM_CHANNELS][NUM_LEDS_PER_CHANNEL];
+#include "PBDriverAdapter.hpp"
+
+PBDriverAdapter driver;
+
+// How many output channels per board (8 for PA0–PA7)
+const int channelCount = 8;
+// How many pixels per channel (adjust as needed)
+const int pixelsPerChannel = 32;
+
 void setup() {
-  Serial1.begin(115200);
-  for (int i = 0; i < NUM_CHANNELS; i++) {
-    FastLED.addLeds<WS2812, channelPins[i], GRB>(leds[i], NUM_LEDS_PER_CHANNEL);
+  // Configure 8 output channels
+  std::unique_ptr<std::vector<PBChannel>> channels(new std::vector<PBChannel>(channelCount));
+  for (int i = 0; i < channelCount; i++) {
+    (*channels)[i].channelId = i;
+    (*channels)[i].channelType = CHANNEL_WS2812;
+    (*channels)[i].numElements = 3; // RGB
+    (*channels)[i].redi = 1;   // Color order: GRB (adjust as needed)
+    (*channels)[i].greeni = 0;
+    (*channels)[i].bluei = 2;
+    (*channels)[i].pixels = pixelsPerChannel;
+    (*channels)[i].startIndex = i * pixelsPerChannel;
+    (*channels)[i].frequency = 800000; // WS2812 frequency
   }
+  driver.configureChannels(std::move(channels));
+  driver.begin();
+  // Set up Serial1 for input on PA10 (PixelBlaze TX)
+Serial1.end();
+Serial1.begin(2000000); // PA10 is RX1 by default on Blue Pill
 }
+
 void loop() {
-  const int FRAME_SIZE = 64 * 15 * 3;
-  static uint8_t frameBuffer[FRAME_SIZE];
-  static int framePos = 0;
-  while (Serial1.available() && framePos < FRAME_SIZE) {
-    frameBuffer[framePos++] = Serial1.read();
-  }
-  if (framePos == FRAME_SIZE) {
-    for (int ch = 0; ch < NUM_CHANNELS; ch++) {
-      int globalCh = FIRST_CHANNEL + ch;
-      int channelOffset = globalCh * NUM_LEDS_PER_CHANNEL * 3;
-      for (int led = 0; led < NUM_LEDS_PER_CHANNEL; led++) {
-        int pixelOffset = channelOffset + led * 3;
-        leds[ch][led] = CRGB(frameBuffer[pixelOffset], frameBuffer[pixelOffset + 1], frameBuffer[pixelOffset + 2]);
-      }
+  unsigned long ms = millis();
+  int channelId = 0;
+  uint8_t rgb[3] = {0, 0, 0};
+
+  // This callback is used to fill pixel data for each channel
+  driver.show(pixelsPerChannel * channelCount, [&](uint16_t index, uint8_t rgbv[]) {
+    uint8_t hue = channelId * 32;
+    float v = (1 + sinf(fmodf((ms + channelId*100) / 160.0, PI)))/2;
+    v = v*v;
+    if (hue < 85) {
+      rgb[0] = hue * 3 * v;
+      rgb[1] = (255 - hue * 3) * v;
+      rgb[2] = 0;
+    } else if (hue < 170) {
+      hue -= 85;
+      rgb[0] = (255 - hue * 3) * v;
+      rgb[1] = 0;
+      rgb[2] = hue * 3 * v;
+    } else {
+      hue -= 170;
+      rgb[0] = 0;
+      rgb[1] = hue * 3 * v;
+      rgb[2] = (255 - hue * 3) * v;
     }
-    FastLED.show();
-    framePos = 0;
-  }
+    memcpy(rgbv, rgb, 3);
+  }, [&](PBChannel * ch) {
+    channelId = ch->channelId;
+  });
 }
